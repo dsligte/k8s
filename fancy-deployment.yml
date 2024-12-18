@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fancy-deployment
+  labels:
+    app: fancy-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: fancy-app
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: fancy-app
+    spec:
+      containers:
+        - name: fancy-container
+          image: your-org/your-app:v2.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: FEATURE_FLAG
+              value: "confetti_mode"
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 3
+
